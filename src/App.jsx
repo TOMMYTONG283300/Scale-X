@@ -1,151 +1,918 @@
 import React, { useState, useRef, useEffect, useMemo } from 'react';
-import { Upload, Download, RefreshCw, Maximize, Sliders, Zap, AlertTriangle, RotateCcw, Globe, Search, X, Shield, FileText, Mail, Cookie, ChevronDown, ChevronUp, BookOpen, Lightbulb, HelpCircle, Star, Users, ArrowRight, Camera, Layers, Sparkles, TrendingUp, Clock, CheckCircle, Eye, Play, Award, Zap as ZapIcon, ImageIcon, MousePointer } from 'lucide-react';
+import { Upload, Download, RefreshCw, Maximize, Sliders, Zap, AlertTriangle, RotateCcw, Globe, X, Shield, FileText, Mail, Cookie, ChevronDown, ChevronUp, BookOpen, Lightbulb, HelpCircle, Star, Users, ArrowRight, ArrowLeft, Camera, Layers, Sparkles, Clock, CheckCircle, Eye, Award, Calendar, User, Tag, Share2, Home } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// Generate realistic demo images
-const generateRealisticDemo = (type, width, height, isBlurry = false) => {
-  const canvas = document.createElement('canvas');
-  canvas.width = width;
-  canvas.height = height;
-  const ctx = canvas.getContext('2d');
-  
-  if (type === 'landscape') {
-    // Sky gradient
-    const skyGrad = ctx.createLinearGradient(0, 0, 0, height * 0.6);
-    skyGrad.addColorStop(0, '#87CEEB');
-    skyGrad.addColorStop(1, '#E0F4FF');
-    ctx.fillStyle = skyGrad;
-    ctx.fillRect(0, 0, width, height * 0.6);
-    
-    // Mountains
-    ctx.fillStyle = '#6B8E6B';
-    ctx.beginPath();
-    ctx.moveTo(0, height * 0.5);
-    ctx.lineTo(width * 0.3, height * 0.25);
-    ctx.lineTo(width * 0.5, height * 0.45);
-    ctx.lineTo(width * 0.7, height * 0.2);
-    ctx.lineTo(width, height * 0.4);
-    ctx.lineTo(width, height * 0.6);
-    ctx.lineTo(0, height * 0.6);
-    ctx.fill();
-    
-    // Ground
-    const groundGrad = ctx.createLinearGradient(0, height * 0.6, 0, height);
-    groundGrad.addColorStop(0, '#90EE90');
-    groundGrad.addColorStop(1, '#228B22');
-    ctx.fillStyle = groundGrad;
-    ctx.fillRect(0, height * 0.6, width, height * 0.4);
-    
-    // Sun
-    ctx.fillStyle = '#FFD700';
-    ctx.beginPath();
-    ctx.arc(width * 0.8, height * 0.15, 30, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Trees
-    for (let i = 0; i < 8; i++) {
-      const x = (width / 8) * i + 20;
-      const treeHeight = 40 + Math.random() * 30;
-      ctx.fillStyle = '#2D5A27';
-      ctx.beginPath();
-      ctx.moveTo(x, height * 0.65);
-      ctx.lineTo(x + 15, height * 0.65 - treeHeight);
-      ctx.lineTo(x + 30, height * 0.65);
-      ctx.fill();
+// Blog articles data
+const BLOG_ARTICLES = {
+  'en': [
+    {
+      id: 'understanding-image-interpolation',
+      title: 'Understanding Image Interpolation: A Complete Guide',
+      excerpt: 'Learn how different interpolation algorithms affect image quality when upscaling photos.',
+      date: '2024-12-14',
+      readTime: '8 min read',
+      category: 'Technology',
+      author: 'Scale X Team',
+      content: `
+## What is Image Interpolation?
+
+Image interpolation is a fundamental technique in digital image processing that allows us to resize images by estimating pixel values at non-integer coordinates. When you upscale an image, you're essentially creating new pixels that didn't exist in the original image.
+
+### Why Do We Need Interpolation?
+
+Digital images are made up of a grid of pixels, each with specific color values. When we want to make an image larger, we need to "fill in the gaps" between existing pixels. This is where interpolation comes in.
+
+## Types of Interpolation Algorithms
+
+### 1. Nearest Neighbor Interpolation
+
+The simplest form of interpolation, nearest neighbor simply copies the value of the closest pixel. While extremely fast, this method produces blocky, pixelated results.
+
+**Pros:**
+- Fastest processing speed
+- Preserves hard edges
+- Good for pixel art
+
+**Cons:**
+- Creates jagged edges (aliasing)
+- Poor quality for photographs
+- Visible pixelation
+
+### 2. Bilinear Interpolation
+
+Bilinear interpolation considers the four nearest pixels and calculates a weighted average based on distance. This produces smoother results than nearest neighbor.
+
+**Pros:**
+- Smoother than nearest neighbor
+- Reasonable processing speed
+- Good balance for real-time applications
+
+**Cons:**
+- Can produce blurry results
+- Loses some sharpness
+- Not ideal for high-quality upscaling
+
+### 3. Bicubic Interpolation
+
+Bicubic interpolation examines 16 surrounding pixels (4x4 grid) and uses cubic polynomials to calculate new pixel values. This is the method Scale X uses for optimal quality.
+
+**Pros:**
+- Produces smooth, natural results
+- Better edge preservation
+- Industry standard for quality
+
+**Cons:**
+- Slower than simpler methods
+- Can introduce slight ringing artifacts
+- More computationally intensive
+
+## How Scale X Optimizes Interpolation
+
+At Scale X, we've implemented an enhanced bicubic interpolation algorithm that combines:
+
+1. **Adaptive sharpening** - Automatically adjusts sharpness based on image content
+2. **Edge detection** - Preserves important edges while smoothing gradients
+3. **Color accuracy** - Maintains true-to-original color representation
+
+## Best Practices for Image Upscaling
+
+### Choose the Right Source Image
+
+The quality of your upscaled image heavily depends on the original:
+
+- Use the highest resolution source available
+- Avoid already-compressed images (multiple JPEG saves)
+- PNG format is preferable over JPEG for source images
+
+### Optimal Upscaling Ratios
+
+- **2x upscaling**: Best quality preservation
+- **4x upscaling**: Good for most use cases
+- **Beyond 4x**: Quality degradation becomes noticeable
+
+### Post-Processing Tips
+
+After upscaling, consider:
+
+1. Minor sharpening adjustments
+2. Noise reduction if needed
+3. Color correction for print output
+
+## Conclusion
+
+Understanding interpolation helps you make better decisions when upscaling images. While AI-based upscaling is becoming popular, traditional algorithms like bicubic interpolation remain reliable and produce consistent, predictable results.
+
+Scale X uses optimized bicubic interpolation to give you the best balance of quality and speed, all processed locally in your browser for maximum privacy.
+      `
+    },
+    {
+      id: 'dpi-ppi-print-guide',
+      title: 'DPI vs PPI: Everything You Need to Know for Print',
+      excerpt: 'Master the difference between DPI and PPI to ensure your prints come out perfectly every time.',
+      date: '2024-12-12',
+      readTime: '10 min read',
+      category: 'Printing',
+      author: 'Scale X Team',
+      content: `
+## The Confusion Between DPI and PPI
+
+One of the most common sources of confusion in digital imaging is the difference between DPI (Dots Per Inch) and PPI (Pixels Per Inch). While often used interchangeably, they refer to different concepts.
+
+## What is PPI (Pixels Per Inch)?
+
+PPI measures the pixel density of a digital image or display. It tells you how many pixels are packed into each inch of the image when displayed or printed at a specific size.
+
+### Understanding PPI in Practice
+
+- A 3000 x 2000 pixel image printed at 10 x 6.67 inches = 300 PPI
+- The same image printed at 20 x 13.33 inches = 150 PPI
+- Displayed on a standard monitor at 100% = 72-96 PPI (varies by monitor)
+
+## What is DPI (Dots Per Inch)?
+
+DPI specifically refers to printing and measures how many ink dots a printer places per inch of paper. Higher DPI means more dots, potentially resulting in finer detail.
+
+### Common DPI Settings
+
+- **300 DPI**: Standard for high-quality photo prints
+- **150 DPI**: Acceptable for viewing from a distance
+- **72 DPI**: Web standard (but this is actually PPI)
+
+## Why Does This Matter for Upscaling?
+
+When preparing images for print, you need to calculate the required pixel dimensions:
+
+### The Formula
+
+Required Pixels = Print Size (inches) × Desired DPI
+
+### Examples
+
+**Business Card (3.5 x 2 inches at 300 DPI):**
+- Width: 3.5 × 300 = 1050 pixels
+- Height: 2 × 300 = 600 pixels
+
+**A4 Poster (8.27 x 11.69 inches at 300 DPI):**
+- Width: 8.27 × 300 = 2481 pixels
+- Height: 11.69 × 300 = 3507 pixels
+
+**Billboard (14 x 48 feet at 15 DPI):**
+- Width: 168 × 15 = 2520 pixels
+- Height: 576 × 15 = 8640 pixels
+
+## Using Scale X for Print Preparation
+
+### Step 1: Determine Your Target Size
+
+Decide on your final print dimensions and required DPI.
+
+### Step 2: Calculate Required Pixels
+
+Use the formula above to find your target resolution.
+
+### Step 3: Upscale Appropriately
+
+If your source image is 1000 x 1000 pixels and you need 3000 x 3000:
+- Use 4x upscaling for a 4000 x 4000 result
+- Crop or resize to exact dimensions as needed
+
+### Step 4: Export and Print
+
+Download your upscaled image and send to your printer with the correct DPI setting.
+
+## Common Mistakes to Avoid
+
+### 1. Upscaling Too Much
+
+Going beyond 4x upscaling often produces unsatisfactory results. If you need a very large print, consider:
+- Using a higher resolution source
+- Accepting some quality loss
+- Choosing a lower DPI for distant viewing
+
+### 2. Ignoring Viewing Distance
+
+Billboards viewed from 50+ feet don't need 300 DPI. Match your DPI to viewing distance:
+- Handheld (books, photos): 300 DPI
+- Arm's length (posters): 150-200 DPI
+- Across the room (banners): 100 DPI
+- Far distance (billboards): 15-30 DPI
+
+### 3. Confusing Monitor Preview with Print Quality
+
+Your monitor shows approximately 72-96 PPI. A 300 DPI print will look much sharper than your screen preview.
+
+## Color Considerations
+
+### RGB vs CMYK
+
+- Digital images use RGB (Red, Green, Blue)
+- Print uses CMYK (Cyan, Magenta, Yellow, Black)
+- Colors may shift when converting between color spaces
+
+### Recommendations
+
+1. Work in RGB for upscaling
+2. Convert to CMYK at the final stage if required by your printer
+3. Request a proof print for color-critical work
+
+## Conclusion
+
+Understanding DPI and PPI is essential for anyone preparing images for print. Use Scale X to upscale your images to the required pixel dimensions, then set the appropriate DPI in your print settings for professional-quality results.
+      `
+    },
+    {
+      id: 'social-media-image-sizes-2024',
+      title: 'Social Media Image Sizes 2024: The Complete Guide',
+      excerpt: 'Stay up to date with the latest image size requirements for all major social media platforms.',
+      date: '2024-12-10',
+      readTime: '7 min read',
+      category: 'Social Media',
+      author: 'Scale X Team',
+      content: `
+## Why Image Size Matters on Social Media
+
+Using correctly sized images on social media isn't just about aesthetics—it directly impacts:
+
+- **Engagement rates**: Properly sized images get more likes and shares
+- **Professional appearance**: Avoid cropped or blurry images
+- **Loading speed**: Optimized sizes load faster on mobile
+- **Algorithm favor**: Platforms prefer correctly formatted content
+
+## Platform-by-Platform Guide
+
+### Instagram
+
+**Feed Posts:**
+- Square: 1080 x 1080 pixels (1:1)
+- Portrait: 1080 x 1350 pixels (4:5)
+- Landscape: 1080 x 566 pixels (1.91:1)
+
+**Stories & Reels:**
+- 1080 x 1920 pixels (9:16)
+
+**Profile Picture:**
+- 320 x 320 pixels (displays at 110 x 110)
+
+**Tips for Instagram:**
+- Use portrait (4:5) for maximum feed real estate
+- High contrast images perform better
+- Avoid text-heavy images in feed
+
+### Facebook
+
+**Feed Posts:**
+- 1200 x 630 pixels (landscape)
+- 1080 x 1080 pixels (square)
+
+**Cover Photo:**
+- 820 x 312 pixels (desktop)
+- 640 x 360 pixels (mobile crop area)
+
+**Profile Picture:**
+- 180 x 180 pixels
+
+**Event Cover:**
+- 1920 x 1005 pixels
+
+**Tips for Facebook:**
+- Text should cover less than 20% of image
+- Use PNG for graphics, JPEG for photos
+
+### Twitter/X
+
+**In-Stream Photos:**
+- 1600 x 900 pixels (16:9)
+- Minimum: 600 x 335 pixels
+
+**Header Image:**
+- 1500 x 500 pixels
+
+**Profile Picture:**
+- 400 x 400 pixels
+
+**Tips for Twitter:**
+- Images with faces get 38% more engagement
+- Use 2-4 images for carousel posts
+
+### LinkedIn
+
+**Feed Posts:**
+- 1200 x 627 pixels (landscape)
+- 1080 x 1080 pixels (square)
+
+**Cover Image:**
+- 1584 x 396 pixels
+
+**Profile Picture:**
+- 400 x 400 pixels
+
+**Company Page Cover:**
+- 1128 x 191 pixels
+
+**Tips for LinkedIn:**
+- Professional, clean images perform best
+- Infographics get high engagement
+
+### Pinterest
+
+**Standard Pin:**
+- 1000 x 1500 pixels (2:3)
+
+**Square Pin:**
+- 1000 x 1000 pixels
+
+**Story Pin:**
+- 1080 x 1920 pixels
+
+**Tips for Pinterest:**
+- Vertical images (2:3) get more saves
+- Text overlays work well on Pinterest
+
+### TikTok
+
+**Video/Image Posts:**
+- 1080 x 1920 pixels (9:16)
+
+**Profile Picture:**
+- 200 x 200 pixels
+
+### YouTube
+
+**Thumbnail:**
+- 1280 x 720 pixels (16:9)
+
+**Channel Banner:**
+- 2560 x 1440 pixels
+- Safe area: 1546 x 423 pixels (center)
+
+**Profile Picture:**
+- 800 x 800 pixels
+
+## How to Use Scale X for Social Media
+
+### Scenario 1: Upscaling a Small Product Photo
+
+Your product image is 500 x 500 pixels, but Instagram recommends 1080 x 1080.
+
+**Solution:**
+1. Upload to Scale X
+2. Use 2x upscaling (500 → 1000 pixels)
+3. Result is 1000 x 1000, close to optimal
+
+### Scenario 2: Creating Multiple Sizes from One Image
+
+You have a 2000 x 2000 pixel image and need:
+- Instagram feed (1080 x 1080)
+- Facebook cover (820 x 312)
+- Twitter header (1500 x 500)
+
+**Solution:**
+1. Use your high-res image as the master
+2. Crop to each platform's aspect ratio
+3. If any version is too small, upscale with Scale X first
+
+### Scenario 3: Repurposing Old Content
+
+You want to repost a 640 x 640 pixel image from 2015.
+
+**Solution:**
+1. Upscale 2x with Scale X (1280 x 1280)
+2. Now suitable for Instagram feed
+3. Quality will be improved vs. the original low-res version
+
+## Quick Reference Table
+
+| Platform | Post Size | Profile | Cover/Header |
+|----------|-----------|---------|--------------|
+| Instagram | 1080×1350 | 320×320 | N/A |
+| Facebook | 1200×630 | 180×180 | 820×312 |
+| Twitter | 1600×900 | 400×400 | 1500×500 |
+| LinkedIn | 1200×627 | 400×400 | 1584×396 |
+| Pinterest | 1000×1500 | 165×165 | N/A |
+| YouTube | 1280×720 | 800×800 | 2560×1440 |
+
+## Conclusion
+
+Keeping up with social media image sizes can be challenging, but using the right dimensions significantly improves your content's performance. Bookmark this guide and use Scale X to upscale any images that don't meet the minimum requirements.
+      `
+    },
+    {
+      id: 'upscaling-old-photos-guide',
+      title: 'How to Restore and Upscale Old Family Photos',
+      excerpt: 'Breathe new life into cherished memories with our step-by-step photo restoration guide.',
+      date: '2024-12-08',
+      readTime: '6 min read',
+      category: 'Tutorial',
+      author: 'Scale X Team',
+      content: `
+## Preserving Family Memories
+
+Old family photographs are irreplaceable treasures. Whether they're faded prints from the 1970s or early digital photos from the 2000s, upscaling can help preserve and enhance these precious memories.
+
+## Before You Start
+
+### Scanning Physical Photos
+
+If working with printed photos:
+
+1. **Use a flatbed scanner** at minimum 300 DPI (600 DPI preferred)
+2. **Clean the scanner bed** to avoid dust spots
+3. **Scan in color** even for black and white photos (captures more detail)
+4. **Save as TIFF or PNG** to avoid compression artifacts
+
+### Assessing Digital Photos
+
+For existing digital files:
+
+1. Check the resolution (right-click → Properties)
+2. Note the file format (JPEG, PNG, etc.)
+3. Look for existing damage (scratches, fading, color shifts)
+
+## Step-by-Step Restoration Process
+
+### Step 1: Create a Backup
+
+Always keep the original file untouched. Make a copy to work with.
+
+### Step 2: Basic Corrections
+
+Before upscaling, consider:
+
+- **Straightening**: Rotate slightly tilted scans
+- **Cropping**: Remove damaged edges or unnecessary borders
+- **Exposure**: Adjust if the image is too dark or bright
+
+### Step 3: Upscaling with Scale X
+
+1. Upload your prepared image
+2. Choose 2x for moderate improvement or 4x for significant enlargement
+3. Process and download
+
+### Step 4: Post-Processing (Optional)
+
+After upscaling, you might want to:
+
+- Remove remaining noise
+- Adjust color balance
+- Add subtle sharpening
+
+## Common Issues and Solutions
+
+### Faded Colors
+
+**Problem**: Old color photos often fade to yellow or magenta.
+
+**Solution**: 
+- Adjust color balance before upscaling
+- Use "Auto Color" in photo editing software
+- Manually adjust color curves
+
+### Scratches and Dust
+
+**Problem**: Physical damage from years of handling.
+
+**Solution**:
+- Use healing/clone tools before upscaling
+- Upscaling can sometimes make scratches more visible
+- Consider professional restoration for severe damage
+
+### Low Resolution
+
+**Problem**: Early digital cameras produced small files (640x480 or less).
+
+**Solution**:
+- Scale X 4x upscaling works well for these
+- Don't expect miracles—extreme upscaling has limits
+- Focus on preserving the memory rather than achieving perfection
+
+### Film Grain
+
+**Problem**: High-ISO film shows visible grain.
+
+**Solution**:
+- Some grain is part of the photo's character
+- Light noise reduction can help
+- Upscaling may make grain more visible
+
+## Realistic Expectations
+
+### What Upscaling Can Do
+
+- Increase print size possibilities
+- Improve apparent sharpness
+- Make images suitable for digital displays
+- Preserve details for future generations
+
+### What Upscaling Cannot Do
+
+- Recover information that doesn't exist
+- Turn a blurry photo into a sharp one
+- Magically add details to overexposed areas
+- Fix severe damage or missing sections
+
+## Recommended Workflow
+
+### For Printing
+
+1. Scan at highest quality
+2. Clean and correct colors
+3. Upscale to desired print size + 10%
+4. Final sharpening
+5. Print at 300 DPI
+
+### For Digital Display
+
+1. Scan at 300 DPI minimum
+2. Basic corrections
+3. Upscale 2x
+4. Save as high-quality JPEG
+5. Share with family!
+
+### For Archival Storage
+
+1. Scan at maximum quality (600+ DPI)
+2. Save original scan without modifications
+3. Create working copy for editing
+4. Store both versions in multiple locations
+
+## Sharing Your Restored Photos
+
+### Creating a Digital Archive
+
+- Use cloud storage for backup
+- Organize by date and family branch
+- Add metadata/descriptions
+- Share access with family members
+
+### Print Options
+
+- Photo books for collections
+- Canvas prints for display
+- Standard prints for albums
+- Metal or acrylic for modern look
+
+## Conclusion
+
+Restoring old photos is a rewarding project that preserves family history for future generations. Scale X makes the upscaling step simple and accessible, with all processing done locally to keep your precious memories private.
+
+Start with your oldest or most damaged photos—you might be surprised how much detail can be recovered!
+      `
+    },
+    {
+      id: 'image-formats-explained',
+      title: 'JPEG vs PNG vs WebP: Choosing the Right Format',
+      excerpt: 'Understanding image formats helps you balance quality, file size, and compatibility.',
+      date: '2024-12-05',
+      readTime: '9 min read',
+      category: 'Technology',
+      author: 'Scale X Team',
+      content: `
+## Why Image Format Matters
+
+The format you choose for saving images affects:
+
+- **File size**: How much storage space it uses
+- **Quality**: Whether details are preserved or lost
+- **Compatibility**: What software/browsers can open it
+- **Features**: Transparency, animation, metadata support
+
+## JPEG (Joint Photographic Experts Group)
+
+### How It Works
+
+JPEG uses "lossy" compression—it permanently discards some image data to reduce file size. The more you compress, the smaller the file, but the more quality you lose.
+
+### Best For
+
+- Photographs
+- Images with gradual color changes
+- Web photos where file size matters
+- Email attachments
+
+### Avoid For
+
+- Images with text or sharp edges
+- Graphics with solid colors
+- Images requiring transparency
+- Files that will be edited multiple times
+
+### Quality Settings
+
+- 90-100%: Nearly lossless, large files
+- 70-89%: Good quality, reasonable size
+- 50-69%: Noticeable quality loss
+- Below 50%: Significant artifacts
+
+### JPEG Artifacts
+
+High compression causes:
+- "Mosquito noise" around edges
+- Color banding in gradients
+- Loss of fine detail
+- Blocky patterns (8x8 pixel blocks)
+
+## PNG (Portable Network Graphics)
+
+### How It Works
+
+PNG uses "lossless" compression—no data is discarded. The file can be opened and saved repeatedly without quality loss.
+
+### Best For
+
+- Graphics with text
+- Logos and icons
+- Screenshots
+- Images requiring transparency
+- Source files for editing
+
+### Avoid For
+
+- Large photographs (file sizes become huge)
+- Situations where file size is critical
+- Print production (TIFF preferred)
+
+### PNG Types
+
+**PNG-8:**
+- 256 colors maximum
+- Smaller file size
+- Good for simple graphics
+
+**PNG-24:**
+- Millions of colors
+- Larger file size
+- Full photo quality
+
+**PNG-32:**
+- PNG-24 + alpha channel
+- Supports transparency
+- Largest file size
+
+## WebP
+
+### How It Works
+
+Developed by Google, WebP supports both lossy and lossless compression, often achieving smaller file sizes than JPEG or PNG at equivalent quality.
+
+### Best For
+
+- Web images (modern browsers)
+- Balancing quality and file size
+- Images needing transparency with small file size
+- Progressive web apps
+
+### Avoid For
+
+- Maximum compatibility needs (older browsers)
+- Print production
+- Situations requiring universal format support
+
+### Browser Support
+
+As of 2024, WebP is supported by:
+- Chrome, Edge, Firefox, Safari
+- Most mobile browsers
+- Not supported by some older systems
+
+## Format Comparison
+
+### File Size (Same 1920x1080 Photo)
+
+| Format | Approx. Size |
+|--------|-------------|
+| PNG | 5-10 MB |
+| JPEG (90%) | 500 KB |
+| JPEG (70%) | 200 KB |
+| WebP (90%) | 300 KB |
+| WebP (70%) | 120 KB |
+
+### Quality Retention After 10 Saves
+
+| Format | Quality |
+|--------|---------|
+| PNG | 100% (lossless) |
+| JPEG | ~60% (cumulative loss) |
+| WebP | 100% (lossless mode) |
+
+## Choosing the Right Format
+
+### Decision Flowchart
+
+**Need transparency?**
+- Yes → PNG or WebP
+- No → Continue
+
+**Is it a photograph?**
+- Yes → JPEG or WebP
+- No → PNG
+
+**Is file size critical?**
+- Yes → JPEG or WebP
+- No → PNG for quality
+
+**Will it be edited again?**
+- Yes → PNG (lossless)
+- No → Format appropriate for use case
+
+## Scale X and Image Formats
+
+### Input Formats Supported
+
+Scale X accepts:
+- JPEG/JPG
+- PNG
+- WebP
+- GIF (static)
+- BMP
+
+### Output Format
+
+Scale X outputs PNG because:
+- Lossless quality after upscaling
+- No additional compression artifacts
+- You can convert to other formats afterward
+- Best preservation of upscaling results
+
+### Recommended Workflow
+
+1. Start with highest quality source (PNG or high-quality JPEG)
+2. Upscale with Scale X (outputs PNG)
+3. Convert to desired format for final use:
+   - JPEG for web photos
+   - PNG for graphics/transparency
+   - WebP for modern web optimization
+
+## Advanced Considerations
+
+### Metadata
+
+- **JPEG**: Supports EXIF (camera info, GPS, etc.)
+- **PNG**: Limited metadata support
+- **WebP**: Supports EXIF and XMP
+
+### Color Profiles
+
+- All formats support ICC color profiles
+- Important for print work
+- sRGB recommended for web
+
+### Animation
+
+- JPEG: No animation support
+- PNG: APNG (limited support)
+- WebP: Full animation support
+- GIF: Animation with 256 color limit
+
+## Conclusion
+
+There's no single "best" format—the right choice depends on your specific needs. For upscaling with Scale X, start with the highest quality source available (preferably PNG), and convert the output to your desired format based on how you'll use the image.
+      `
     }
-  } else if (type === 'portrait') {
-    // Background gradient
-    const bgGrad = ctx.createRadialGradient(width/2, height/2, 0, width/2, height/2, width);
-    bgGrad.addColorStop(0, '#FFE4E1');
-    bgGrad.addColorStop(1, '#DDA0DD');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, width, height);
-    
-    // Simple face silhouette
-    ctx.fillStyle = '#FDBEB1';
-    ctx.beginPath();
-    ctx.ellipse(width/2, height * 0.35, width * 0.25, height * 0.22, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Hair
-    ctx.fillStyle = '#4A3728';
-    ctx.beginPath();
-    ctx.ellipse(width/2, height * 0.22, width * 0.28, height * 0.15, 0, 0, Math.PI);
-    ctx.fill();
-    
-    // Body/shoulders
-    ctx.fillStyle = '#6B8DD6';
-    ctx.beginPath();
-    ctx.ellipse(width/2, height * 0.85, width * 0.4, height * 0.35, 0, Math.PI, 0);
-    ctx.fill();
-  } else {
-    // Abstract/Anime style
-    const bgGrad = ctx.createLinearGradient(0, 0, width, height);
-    bgGrad.addColorStop(0, '#667eea');
-    bgGrad.addColorStop(1, '#764ba2');
-    ctx.fillStyle = bgGrad;
-    ctx.fillRect(0, 0, width, height);
-    
-    // Anime character silhouette
-    ctx.fillStyle = '#FFE4C4';
-    ctx.beginPath();
-    ctx.ellipse(width/2, height * 0.3, width * 0.18, height * 0.15, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Big anime hair
-    ctx.fillStyle = '#FF69B4';
-    ctx.beginPath();
-    ctx.ellipse(width/2, height * 0.2, width * 0.25, height * 0.18, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Eyes (anime style - big)
-    ctx.fillStyle = '#4169E1';
-    ctx.beginPath();
-    ctx.ellipse(width * 0.42, height * 0.28, 12, 16, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(width * 0.58, height * 0.28, 12, 16, 0, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Eye highlights
-    ctx.fillStyle = '#FFFFFF';
-    ctx.beginPath();
-    ctx.arc(width * 0.44, height * 0.26, 4, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(width * 0.60, height * 0.26, 4, 0, Math.PI * 2);
-    ctx.fill();
-    
-    // Body
-    ctx.fillStyle = '#FF6B9D';
-    ctx.fillRect(width * 0.3, height * 0.45, width * 0.4, height * 0.55);
-  }
-  
-  // Apply blur effect for "before" images
-  if (isBlurry) {
-    ctx.filter = 'blur(2px)';
-    const imageData = ctx.getImageData(0, 0, width, height);
-    ctx.putImageData(imageData, 0, 0);
-    ctx.filter = 'none';
-    
-    // Add noise/artifacts for blurry version
-    ctx.fillStyle = 'rgba(128, 128, 128, 0.1)';
-    for (let i = 0; i < 500; i++) {
-      ctx.fillRect(Math.random() * width, Math.random() * height, 2, 2);
+  ],
+  'zh-TW': [
+    {
+      id: 'understanding-image-interpolation',
+      title: '深入了解圖片插值技術：完整指南',
+      excerpt: '了解不同的插值演算法如何影響圖片放大時的品質表現。',
+      date: '2024-12-14',
+      readTime: '8 分鐘',
+      category: '技術',
+      author: 'Scale X 團隊',
+      content: `
+## 什麼是圖片插值？
+
+圖片插值是數位影像處理中的基礎技術，它讓我們能夠透過估算非整數座標的像素值來調整圖片大小。當你放大圖片時，實際上是在創造原始圖片中不存在的新像素。
+
+### 為什麼需要插值？
+
+數位圖片由像素網格組成，每個像素都有特定的顏色值。當我們想要放大圖片時，需要「填補」現有像素之間的空隙。這就是插值技術派上用場的地方。
+
+## 插值演算法的類型
+
+### 1. 最近鄰插值
+
+最簡單的插值形式，最近鄰插值只是複製最接近像素的值。雖然速度極快，但這種方法會產生塊狀、像素化的結果。
+
+**優點：**
+- 處理速度最快
+- 保留硬邊緣
+- 適合像素藝術
+
+**缺點：**
+- 產生鋸齒狀邊緣
+- 照片品質差
+- 明顯的像素化
+
+### 2. 雙線性插值
+
+雙線性插值考慮最近的四個像素，並根據距離計算加權平均值。這比最近鄰產生更平滑的結果。
+
+### 3. 雙三次插值
+
+雙三次插值檢查周圍 16 個像素（4x4 網格），並使用三次多項式來計算新的像素值。這是 Scale X 使用的方法，以獲得最佳品質。
+
+**優點：**
+- 產生平滑、自然的結果
+- 更好的邊緣保留
+- 業界品質標準
+
+## Scale X 如何優化插值
+
+Scale X 實施了增強型雙三次插值演算法，結合了：
+
+1. **自適應銳化** - 根據圖片內容自動調整銳度
+2. **邊緣偵測** - 保留重要邊緣同時平滑漸層
+3. **色彩準確性** - 維持與原始相符的色彩表現
+
+## 圖片放大最佳實踐
+
+### 選擇正確的來源圖片
+
+放大後的圖片品質很大程度取決於原始圖片：
+
+- 使用可用的最高解析度來源
+- 避免已經壓縮過的圖片
+- PNG 格式優於 JPEG
+
+### 最佳放大比例
+
+- **2 倍放大**：品質保留最佳
+- **4 倍放大**：適合大多數使用情況
+- **超過 4 倍**：品質下降會變得明顯
+
+## 結論
+
+了解插值有助於你在放大圖片時做出更好的決定。Scale X 使用優化的雙三次插值，為你提供品質和速度的最佳平衡，所有處理都在你的瀏覽器中本地完成，確保最大程度的隱私保護。
+      `
+    },
+    {
+      id: 'social-media-image-sizes-2024',
+      title: '2024 社群媒體圖片尺寸完整指南',
+      excerpt: '掌握各大社群平台的最新圖片尺寸要求，讓你的貼文脫穎而出。',
+      date: '2024-12-10',
+      readTime: '7 分鐘',
+      category: '社群媒體',
+      author: 'Scale X 團隊',
+      content: `
+## 為什麼圖片尺寸很重要？
+
+在社群媒體上使用正確尺寸的圖片不僅關乎美觀，還直接影響：
+
+- **互動率**：正確尺寸的圖片獲得更多讚和分享
+- **專業形象**：避免裁切或模糊的圖片
+- **載入速度**：優化的尺寸在手機上載入更快
+
+## 各平台指南
+
+### Instagram
+
+**動態貼文：**
+- 正方形：1080 x 1080 像素
+- 直式：1080 x 1350 像素（推薦）
+- 橫式：1080 x 566 像素
+
+**限時動態：**
+- 1080 x 1920 像素
+
+### Facebook
+
+**動態貼文：**
+- 1200 x 630 像素（橫式）
+- 1080 x 1080 像素（正方形）
+
+**封面照片：**
+- 820 x 312 像素
+
+### LINE
+
+**聊天室圖片：**
+- 建議 1024 x 1024 像素以上
+
+## 使用 Scale X 製作社群圖片
+
+### 情境：放大小型產品照
+
+你的產品圖片是 500 x 500 像素，但 Instagram 建議 1080 x 1080。
+
+**解決方案：**
+1. 上傳到 Scale X
+2. 使用 2 倍放大（500 → 1000 像素）
+3. 結果為 1000 x 1000，接近最佳尺寸
+
+## 快速參考表
+
+| 平台 | 貼文尺寸 | 大頭貼 | 封面 |
+|------|---------|--------|------|
+| Instagram | 1080×1350 | 320×320 | 無 |
+| Facebook | 1200×630 | 180×180 | 820×312 |
+| LINE | 1024×1024 | 480×480 | 無 |
+
+## 結論
+
+保持社群媒體圖片尺寸正確可能很有挑戰性，但使用正確的尺寸可以顯著提升內容的表現。將此指南加入書籤，並使用 Scale X 放大任何不符合最低要求的圖片。
+      `
     }
-  } else {
-    // Add sharpness/detail for "after" images
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
-    ctx.lineWidth = 0.5;
-    for (let i = 0; i < 20; i++) {
-      ctx.beginPath();
-      ctx.moveTo(Math.random() * width, Math.random() * height);
-      ctx.lineTo(Math.random() * width, Math.random() * height);
-      ctx.stroke();
-    }
-  }
-  
-  return canvas.toDataURL('image/png');
+  ]
 };
 
 const TRANSLATIONS = {
@@ -153,7 +920,7 @@ const TRANSLATIONS = {
     title: 'Scale X',
     subtitle: '智能影像無損放大工具',
     heroTitle: '讓模糊照片重獲新生',
-    heroSubtitle: '使用 AI 智能演算法，將低解析度圖片放大 2-4 倍，同時保持清晰銳利',
+    heroSubtitle: '使用智能演算法，將低解析度圖片放大 2-4 倍，同時保持清晰銳利',
     uploadTitle: '上傳您想要增強的照片',
     uploadSubtitle: '點擊此處或將檔案拖曳至視窗內',
     limit: '限制：圖片單邊最大 4096px',
@@ -170,119 +937,82 @@ const TRANSLATIONS = {
     labelOriginal: '原始',
     labelEnhanced: 'Scale X 增強',
     feat1Title: '智能縮放演算法',
-    feat1Desc: '採用先進重採樣演算法，有效填補像素空隙，消除鋸齒並提升清晰度。',
+    feat1Desc: '採用先進雙三次插值演算法，有效填補像素空隙，消除鋸齒。',
     feat2Title: '隱私本地運算',
-    feat2Desc: '所有影像處理均在您的瀏覽器端完成，照片絕不回傳伺服器，100% 安全。',
+    feat2Desc: '所有影像處理均在您的瀏覽器端完成，照片絕不回傳伺服器。',
     feat3Title: '4K/8K 大圖支援',
-    feat3Desc: '優化記憶體管理，支援輸出高解析度大圖，滿足印刷與專業設計需求。',
-    footer: '© 2024 Scale X 影像實驗室',
+    feat3Desc: '優化記憶體管理，支援輸出高解析度大圖，滿足印刷需求。',
+    footer: '© 2024 Scale X Lab',
     alertType: '請上傳圖片檔案',
-    alertBig: '圖片過大！為了瀏覽器穩定，請上傳長寬小於 4096px 的圖片。',
+    alertBig: '圖片過大！請上傳長寬小於 4096px 的圖片。',
     alertFail: '圖片讀取失敗',
-    alertOutputBig: '放大後的圖片過大，可能導致瀏覽器當機。請降低倍率或使用較小的圖片。',
-    interactiveDemo: '互動式效果展示',
-    interactiveDemoDesc: '拖曳滑桿查看放大前後對比效果',
-    dragToCompare: '← 拖曳比較 →',
-    beforeLabel: '放大前',
-    afterLabel: '放大後',
-    tryYourOwn: '試試您自己的圖片',
+    alertOutputBig: '放大後的圖片過大，請降低倍率。',
     statsProcessed: '張圖片已處理',
     statsUsers: '位用戶信賴',
     statsCountries: '個國家使用',
     statsSatisfaction: '滿意度',
-    liveDemo: '即時體驗',
-    noUploadNeeded: '無需上傳，立即體驗效果',
-    sampleImages: '範例圖片',
-    landscapePhoto: '風景照片',
-    portraitPhoto: '人像照片',
-    animeArt: '動漫插畫',
-    clickToTry: '點擊試用',
-    guideTitle: '如何使用 Scale X 放大圖片？',
-    guideSubtitle: '只需三個簡單步驟，即可獲得高品質放大圖片',
+    guideTitle: '如何使用 Scale X？',
+    guideSubtitle: '三個簡單步驟獲得高品質放大圖片',
     guideSteps: [
-      { title: '上傳圖片', desc: '點擊上傳區域或直接拖曳圖片檔案。支援 JPG、PNG、WebP 等常見格式。' },
-      { title: '選擇放大倍率', desc: '根據您的需求選擇 2 倍或 4 倍放大。系統會即時顯示預計輸出尺寸。' },
-      { title: '下載成品', desc: '處理完成後，使用滑桿比較前後效果，滿意後即可一鍵下載。' }
+      { title: '上傳圖片', desc: '點擊上傳區域或直接拖曳圖片。支援 JPG、PNG、WebP 等格式。' },
+      { title: '選擇倍率', desc: '根據需求選擇 2 倍或 4 倍放大。系統即時顯示預計尺寸。' },
+      { title: '下載成品', desc: '處理完成後，使用滑桿比較效果，滿意後一鍵下載。' }
     ],
     useCasesTitle: '適用場景',
     useCases: [
-      { title: '電商產品圖', desc: '將低解析度的產品圖片放大，用於網站展示或印刷目錄。' },
-      { title: '社群媒體素材', desc: '放大舊照片或低畫質圖片，製作高品質的社群貼文。' },
-      { title: '印刷輸出', desc: '將數位照片放大至印刷所需解析度，製作海報或相簿。' },
-      { title: '動漫插畫', desc: '放大動漫圖片或插畫，保持線條清晰不模糊。' },
-      { title: '舊照片修復', desc: '放大並增強老舊的家庭照片，重現珍貴回憶。' },
-      { title: '遊戲素材', desc: '放大遊戲截圖或素材，用於攻略製作或社群分享。' }
+      { title: '電商產品圖', desc: '放大產品圖片用於網站展示或印刷目錄。' },
+      { title: '社群媒體', desc: '放大舊照片製作高品質社群貼文。' },
+      { title: '印刷輸出', desc: '放大至印刷解析度製作海報相簿。' },
+      { title: '動漫插畫', desc: '放大動漫圖片保持線條清晰。' },
+      { title: '舊照修復', desc: '放大增強老舊家庭照片。' },
+      { title: '遊戲素材', desc: '放大遊戲截圖用於攻略分享。' }
     ],
     techTitle: '我們的技術',
-    techContent: 'Scale X 採用先進的雙三次插值（Bicubic Interpolation）演算法，結合影像銳化技術，在放大圖片時智能填補像素空隙。與傳統最近鄰插值相比，我們的方法能有效減少鋸齒和模糊現象，產生更平滑自然的放大效果。所有運算都在您的瀏覽器中完成，無需上傳圖片到伺服器，確保您的隱私安全。',
-    comparisonTitle: 'Scale X vs 傳統方法',
-    comparisonHeaders: ['功能', 'Scale X', '傳統軟體', '線上工具'],
-    comparisonRows: [
-      ['價格', '完全免費', '需付費購買', '部分免費'],
-      ['隱私保護', '本地處理', '本地處理', '需上傳伺服器'],
-      ['安裝需求', '無需安裝', '需下載安裝', '無需安裝'],
-      ['處理速度', '即時處理', '依電腦效能', '需等待伺服器'],
-      ['使用難度', '簡單直觀', '需學習操作', '簡單']
-    ],
+    techContent: 'Scale X 採用先進的雙三次插值演算法，結合影像銳化技術，在放大圖片時智能填補像素空隙。所有運算都在您的瀏覽器中完成，確保隱私安全。',
     faqTitle: '常見問題',
     faqItems: [
-      { q: '這個服務是免費的嗎？', a: '是的，Scale X 完全免費使用，沒有隱藏費用，也沒有每日使用次數限制。' },
-      { q: '我的圖片會被上傳到伺服器嗎？', a: '不會。所有圖片處理都在您的瀏覽器中完成，圖片永遠不會離開您的設備。' },
-      { q: '支援哪些圖片格式？', a: '支援 JPG/JPEG、PNG、WebP、GIF（靜態）、BMP 等常見格式。' },
-      { q: '最大可以處理多大的圖片？', a: '為確保瀏覽器穩定，輸入圖片單邊不超過 4096 像素。' },
-      { q: '放大後的圖片品質如何？', a: '使用雙三次插值演算法配合銳化處理，盡可能保持品質。原圖品質越高，效果越好。' },
-      { q: '可以放大到多大？', a: '支援 2 倍和 4 倍放大。例如 1000x1000 可放大到 4000x4000。' }
-    ],
-    articlesTitle: '圖片放大技巧與教學',
-    articles: [
-      { title: '如何選擇適合放大的圖片？', summary: '了解哪些類型的圖片能獲得最佳放大效果', content: '清晰、對焦準確的照片放大效果最好。避免已經模糊、過度壓縮的圖片。向量風格的插畫和動漫圖片通常比真實照片更容易保持放大後的品質。' },
-      { title: '放大圖片用於印刷的注意事項', summary: '將數位圖片放大用於印刷時的要點', content: '印刷品需要 300 DPI 解析度。要印刷 10x10 公分的圖片，需要約 1181x1181 像素。選擇能滿足需求的最小倍率，避免過度放大。' },
-      { title: '社群媒體圖片尺寸指南', summary: '各大社群平台的最佳圖片尺寸', content: 'Instagram 建議 1080x1080 像素，Facebook 建議 1200x630 像素，Twitter 建議 1200x675 像素。' }
+      { q: '這是免費的嗎？', a: '是的，完全免費，沒有使用限制。' },
+      { q: '圖片會上傳到伺服器嗎？', a: '不會，所有處理都在您的瀏覽器本地完成。' },
+      { q: '支援哪些格式？', a: '支援 JPG、PNG、WebP、GIF、BMP 等常見格式。' },
+      { q: '最大能處理多大？', a: '為確保穩定，輸入圖片單邊不超過 4096 像素。' },
+      { q: '可以放大多少倍？', a: '支援 2 倍和 4 倍放大。' }
     ],
     testimonialsTitle: '用戶評價',
     testimonials: [
-      { name: '陳小明', role: '電商賣家', text: '用 Scale X 放大產品圖後品質很好，網站看起來專業多了！', avatar: 'C' },
-      { name: '林美玲', role: '部落客', text: '介面簡單，不用註冊就能用，圖片不會被上傳，很安心。', avatar: 'L' },
-      { name: '王大華', role: '設計師', text: '快速處理小圖片非常方便，省下很多時間。', avatar: 'W' },
-      { name: '張小芳', role: '攝影愛好者', text: '老照片放大後細節清晰很多，效果超出預期！', avatar: 'Z' },
-      { name: '李志明', role: '遊戲實況主', text: '遊戲截圖放大後畫質保持得很好，粉絲都說讚。', avatar: 'L' }
+      { name: 'Michael Chen', role: 'E-commerce Owner, USA', text: 'Scale X transformed my product images. The quality improvement is remarkable and my conversion rate increased!', avatar: 'M' },
+      { name: 'Sophie Martin', role: 'Graphic Designer, France', text: 'Incroyable! I use it daily for client work. The local processing means my designs stay private.', avatar: 'S' },
+      { name: 'Carlos Rodriguez', role: 'Photographer, Spain', text: 'Excelente herramienta para restaurar fotos antiguas. My clients are always impressed with the results.', avatar: 'C' },
+      { name: 'Emma Williams', role: 'Blogger, UK', text: 'Brilliant tool! No sign-up required and it actually works. My blog images look so much better now.', avatar: 'E' },
+      { name: 'Hans Mueller', role: 'Print Shop Owner, Germany', text: 'Wunderbar! Perfect for quickly upscaling customer photos for large format printing.', avatar: 'H' }
     ],
-    cookieTitle: 'Cookie 使用通知',
+    cookieTitle: 'Cookie 通知',
     cookieText: '我們使用 Cookie 來改善您的瀏覽體驗。',
     cookieAccept: '接受',
     cookieDecline: '拒絕',
-    cookieLearnMore: '了解更多',
     privacyPolicy: '隱私政策',
     termsOfService: '服務條款',
     contactUs: '聯絡我們',
     aboutUs: '關於我們',
     faq: '常見問題',
-    companyName: 'Scale X 影像實驗室',
+    companyName: 'Scale X Lab',
     companyEmail: 'support@scalex.example.com',
     privacyTitle: '隱私政策',
-    privacyContent: '<h3>1. 資料收集</h3><p>Scale X 採用純本地處理技術，不會收集、儲存或傳輸您上傳的任何圖片。</p><h3>2. Cookie</h3><p>我們使用必要性 Cookie 記住語言偏好，以及分析性 Cookie 改善服務。</p><h3>3. 聯絡我們</h3><p>如有問題，請聯絡 support@scalex.example.com</p>',
+    privacyContent: '<h3>資料收集</h3><p>Scale X 不會收集或上傳您的圖片。所有處理都在本地完成。</p><h3>Cookie</h3><p>用於語言偏好和匿名分析。</p>',
     termsTitle: '服務條款',
-    termsContent: '<h3>1. 服務描述</h3><p>Scale X 提供免費的線上圖片放大服務，使用瀏覽器本地運算技術。</p><h3>2. 使用規範</h3><p>請勿用於處理侵權或非法內容。</p><h3>3. 聯絡方式</h3><p>support@scalex.example.com</p>',
-    aboutTitle: '關於 Scale X',
-    aboutContent: 'Scale X 由熱愛影像處理技術的工程師於 2024 年創立。我們的使命是讓每個人都能輕鬆獲得高品質的圖片放大服務，無需安裝軟體，無需擔心隱私。',
-    lastUpdated: '最後更新：2024年12月',
-    readMore: '閱讀更多',
-    readLess: '收起',
-    viewMoreFaq: '查看更多',
-    recentUpdates: '最新更新',
-    updateLog: [
-      { date: '2024-12-15', title: '效能優化', desc: '提升大圖處理速度 30%' },
-      { date: '2024-12-10', title: '新增語言', desc: '新增多國語言支援' },
-      { date: '2024-12-05', title: '介面更新', desc: '全新設計的使用者介面' }
-    ],
-    blogTitle: '影像處理知識庫',
-    blogPosts: [
-      { title: '什麼是圖片插值？', date: '2024-12-14', readTime: '5 分鐘', content: '圖片插值是數位影像處理中的核心技術。最常見的方法包括最近鄰插值、雙線性插值和雙三次插值。Scale X 採用雙三次插值，考慮周圍 16 個像素，產生最自然的放大效果。' },
-      { title: 'DPI 與 PPI 完全指南', date: '2024-12-12', readTime: '7 分鐘', content: 'PPI 是螢幕上每英寸的像素數，DPI 是印刷時每英寸的墨點數。網頁圖片使用 72 PPI，印刷品需要 300 DPI 以上。' },
-      { title: '圖片格式選擇指南', date: '2024-12-10', readTime: '6 分鐘', content: 'JPEG 適合照片但有損壓縮，PNG 無損壓縮適合需要透明背景的圖片，WebP 檔案更小且支援有損和無損壓縮。' }
-    ],
+    termsContent: '<h3>服務</h3><p>Scale X 提供免費的本地圖片放大服務。</p><h3>使用規範</h3><p>請勿用於非法內容。</p>',
+    aboutTitle: '關於我們',
+    aboutContent: 'Scale X 由熱愛影像處理的工程師於 2024 年創立，致力於提供免費、隱私的圖片放大服務。',
+    blogTitle: '部落格',
+    blogSubtitle: '圖片處理技巧與教學文章',
+    readArticle: '閱讀全文',
+    backToBlog: '返回部落格',
+    backToHome: '返回首頁',
+    relatedArticles: '相關文章',
+    shareArticle: '分享文章',
+    home: '首頁',
+    blog: '部落格',
     seoTitle: '為什麼選擇 Scale X？',
-    seoContent: 'Scale X 是免費的線上圖片放大工具，使用瀏覽器本地運算將模糊照片變清晰。支援 JPG、PNG 格式，可放大 2-4 倍，是 Photoshop 的最佳輕量化替代方案。'
+    seoContent: 'Scale X 是免費的線上圖片放大工具，使用瀏覽器本地運算將模糊照片變清晰。支援 JPG、PNG 格式，可放大 2-4 倍。'
   },
   'en': {
     title: 'Scale X',
@@ -305,33 +1035,20 @@ const TRANSLATIONS = {
     labelOriginal: 'Original',
     labelEnhanced: 'Enhanced',
     feat1Title: 'Smart Algorithm',
-    feat1Desc: 'Advanced resampling reduces aliasing and enhances clarity.',
+    feat1Desc: 'Advanced bicubic interpolation reduces aliasing and enhances clarity.',
     feat2Title: 'Local Privacy',
-    feat2Desc: 'All processing in your browser. Images never uploaded.',
+    feat2Desc: 'All processing in your browser. Images never leave your device.',
     feat3Title: '4K/8K Support',
-    feat3Desc: 'Optimized for high-resolution output.',
+    feat3Desc: 'Optimized for high-resolution output, perfect for printing.',
     footer: '© 2024 Scale X Lab',
     alertType: 'Please upload an image file.',
     alertBig: 'Image too large! Max 4096px per side.',
     alertFail: 'Failed to read image.',
     alertOutputBig: 'Output too large. Please reduce scale.',
-    interactiveDemo: 'Interactive Demo',
-    interactiveDemoDesc: 'Drag the slider to compare before and after',
-    dragToCompare: '← Drag to Compare →',
-    beforeLabel: 'Before',
-    afterLabel: 'After',
-    tryYourOwn: 'Try Your Own Image',
     statsProcessed: 'Images Processed',
     statsUsers: 'Users Trust Us',
     statsCountries: 'Countries',
     statsSatisfaction: 'Satisfaction',
-    liveDemo: 'Live Demo',
-    noUploadNeeded: 'No upload needed, try it now',
-    sampleImages: 'Sample Images',
-    landscapePhoto: 'Landscape',
-    portraitPhoto: 'Portrait',
-    animeArt: 'Anime Art',
-    clickToTry: 'Click to Try',
     guideTitle: 'How to Use Scale X?',
     guideSubtitle: 'Three simple steps to high-quality upscaled images',
     guideSteps: [
@@ -350,39 +1067,26 @@ const TRANSLATIONS = {
     ],
     techTitle: 'Our Technology',
     techContent: 'Scale X uses Bicubic Interpolation with image sharpening to fill pixel gaps when upscaling. All computation is done in your browser using HTML5 Canvas API, ensuring privacy.',
-    comparisonTitle: 'Scale X vs Others',
-    comparisonHeaders: ['Feature', 'Scale X', 'Traditional', 'Online Tools'],
-    comparisonRows: [
-      ['Price', 'Free', 'Paid', 'Partly Free'],
-      ['Privacy', 'Local', 'Local', 'Server Upload'],
-      ['Install', 'None', 'Required', 'None'],
-      ['Speed', 'Instant', 'Varies', 'Queue']
-    ],
     faqTitle: 'FAQ',
     faqItems: [
       { q: 'Is this free?', a: 'Yes, completely free with no limits.' },
       { q: 'Are images uploaded?', a: 'No, all processing is local in your browser.' },
       { q: 'What formats?', a: 'JPG, PNG, WebP, GIF (static), BMP.' },
       { q: 'Max size?', a: '4096 pixels per side for stability.' },
-      { q: 'Quality?', a: 'Bicubic interpolation maintains quality. Better originals = better results.' }
+      { q: 'How much can I upscale?', a: 'We support 2x and 4x upscaling.' }
     ],
-    articlesTitle: 'Tips & Tutorials',
-    articles: [
-      { title: 'Choosing Images for Upscaling', summary: 'Which images work best', content: 'Sharp, focused photos upscale best. Avoid blurry or heavily compressed images.' },
-      { title: 'Upscaling for Print', summary: 'Resolution tips for printing', content: 'Print needs 300 DPI. Calculate required pixels for your target size.' },
-      { title: 'Social Media Sizes', summary: 'Optimal dimensions for platforms', content: 'Instagram: 1080x1080, Facebook: 1200x630, Twitter: 1200x675.' }
-    ],
-    testimonialsTitle: 'Reviews',
+    testimonialsTitle: 'What Our Users Say',
     testimonials: [
-      { name: 'John S.', role: 'Seller', text: 'Product images look professional now!', avatar: 'J' },
-      { name: 'Emily C.', role: 'Blogger', text: 'Easy to use, no registration, private.', avatar: 'E' },
-      { name: 'David W.', role: 'Designer', text: 'Quick and convenient for small tasks.', avatar: 'D' }
+      { name: 'Michael Chen', role: 'E-commerce Owner, USA', text: 'Scale X transformed my product images. The quality improvement is remarkable and my conversion rate increased!', avatar: 'M' },
+      { name: 'Sophie Martin', role: 'Graphic Designer, France', text: 'Incroyable! I use it daily for client work. The local processing means my designs stay private.', avatar: 'S' },
+      { name: 'Carlos Rodriguez', role: 'Photographer, Spain', text: 'Excelente herramienta para restaurar fotos antiguas. My clients are always impressed with the results.', avatar: 'C' },
+      { name: 'Emma Williams', role: 'Blogger, UK', text: 'Brilliant tool! No sign-up required and it actually works. My blog images look so much better now.', avatar: 'E' },
+      { name: 'Hans Mueller', role: 'Print Shop Owner, Germany', text: 'Wunderbar! Perfect for quickly upscaling customer photos for large format printing.', avatar: 'H' }
     ],
     cookieTitle: 'Cookie Notice',
     cookieText: 'We use cookies to improve your experience.',
     cookieAccept: 'Accept',
     cookieDecline: 'Decline',
-    cookieLearnMore: 'Learn More',
     privacyPolicy: 'Privacy Policy',
     termsOfService: 'Terms of Service',
     contactUs: 'Contact',
@@ -391,27 +1095,20 @@ const TRANSLATIONS = {
     companyName: 'Scale X Lab',
     companyEmail: 'support@scalex.example.com',
     privacyTitle: 'Privacy Policy',
-    privacyContent: '<h3>Data</h3><p>We do not collect or upload your images.</p><h3>Cookies</h3><p>Used for preferences and analytics.</p>',
+    privacyContent: '<h3>Data</h3><p>We do not collect or upload your images. All processing is local.</p><h3>Cookies</h3><p>Used for preferences and anonymous analytics.</p>',
     termsTitle: 'Terms',
-    termsContent: '<h3>Service</h3><p>Free image upscaling using local browser computing.</p><h3>Usage</h3><p>Do not use for illegal content.</p>',
+    termsContent: '<h3>Service</h3><p>Free local image upscaling.</p><h3>Usage</h3><p>Do not use for illegal content.</p>',
     aboutTitle: 'About',
-    aboutContent: 'Scale X was founded in 2024 to make high-quality image upscaling accessible to everyone.',
-    lastUpdated: 'Updated: Dec 2024',
-    readMore: 'Read More',
-    readLess: 'Less',
-    viewMoreFaq: 'More FAQ',
-    recentUpdates: 'Updates',
-    updateLog: [
-      { date: '2024-12-15', title: 'Performance', desc: '30% faster processing' },
-      { date: '2024-12-10', title: 'Languages', desc: 'Added new languages' },
-      { date: '2024-12-05', title: 'UI Update', desc: 'New interface design' }
-    ],
-    blogTitle: 'Knowledge Base',
-    blogPosts: [
-      { title: 'Image Interpolation Explained', date: '2024-12-14', readTime: '5 min', content: 'Scale X uses bicubic interpolation, considering 16 surrounding pixels for natural results.' },
-      { title: 'DPI vs PPI Guide', date: '2024-12-12', readTime: '7 min', content: 'Web uses 72 PPI, print needs 300+ DPI for sharp results.' },
-      { title: 'Format Selection', date: '2024-12-10', readTime: '6 min', content: 'JPEG for photos, PNG for transparency, WebP for smaller files.' }
-    ],
+    aboutContent: 'Scale X was founded in 2024 by engineers passionate about image processing, providing free and private image upscaling.',
+    blogTitle: 'Blog',
+    blogSubtitle: 'Tips, tutorials, and insights about image processing',
+    readArticle: 'Read Article',
+    backToBlog: 'Back to Blog',
+    backToHome: 'Back to Home',
+    relatedArticles: 'Related Articles',
+    shareArticle: 'Share Article',
+    home: 'Home',
+    blog: 'Blog',
     seoTitle: 'Why Scale X?',
     seoContent: 'Scale X is a free online image upscaler using local browser computing. Upscale 2-4x while maintaining quality. Supports JPG, PNG.'
   }
@@ -461,56 +1158,8 @@ const FAQItem = ({ question, answer }) => {
   );
 };
 
-const InteractiveDemo = ({ t, beforeImage, afterImage }) => {
-  const [position, setPosition] = useState(50);
-  const containerRef = useRef(null);
-  
-  const handleMove = (e) => {
-    if (!containerRef.current) return;
-    const rect = containerRef.current.getBoundingClientRect();
-    const x = (e.clientX || e.touches?.[0]?.clientX) - rect.left;
-    setPosition(Math.max(0, Math.min(100, (x / rect.width) * 100)));
-  };
-  
-  return (
-    <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
-      <div 
-        ref={containerRef}
-        className="relative aspect-square cursor-col-resize select-none"
-        onMouseMove={handleMove}
-        onTouchMove={handleMove}
-      >
-        {/* Before image (blurry) */}
-        <img src={beforeImage} alt="Before" className="absolute inset-0 w-full h-full object-cover" />
-        
-        {/* After image (clear) with clip */}
-        <div className="absolute inset-0" style={{ clipPath: `inset(0 ${100 - position}% 0 0)` }}>
-          <img src={afterImage} alt="After" className="absolute inset-0 w-full h-full object-cover" />
-        </div>
-        
-        {/* Slider line */}
-        <div className="absolute top-0 bottom-0 w-1 bg-white shadow-lg" style={{ left: `${position}%` }}>
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-full shadow-xl flex items-center justify-center border-2 border-blue-500">
-            <MousePointer size={16} className="text-blue-500" />
-          </div>
-        </div>
-        
-        {/* Labels */}
-        <div className="absolute top-3 left-3 bg-black/60 text-white px-2 py-1 rounded text-xs font-bold">{t.beforeLabel}</div>
-        <div className="absolute top-3 right-3 bg-blue-600 text-white px-2 py-1 rounded text-xs font-bold">{t.afterLabel}</div>
-        
-        {/* Drag hint */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 bg-black/60 text-white px-3 py-1 rounded-full text-xs">
-          {t.dragToCompare}
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const AnimatedCounter = ({ end, suffix = '' }) => {
   const [count, setCount] = useState(0);
-  
   useEffect(() => {
     const duration = 2000;
     const steps = 60;
@@ -527,12 +1176,138 @@ const AnimatedCounter = ({ end, suffix = '' }) => {
     }, duration / steps);
     return () => clearInterval(timer);
   }, [end]);
-  
   return <span>{count.toLocaleString()}{suffix}</span>;
 };
 
+// Blog Article Page Component
+const BlogArticlePage = ({ article, t, onBack, relatedArticles }) => {
+  return (
+    <div className="min-h-screen bg-white">
+      {/* Article Header */}
+      <header className="bg-gradient-to-br from-blue-600 to-indigo-700 text-white py-16">
+        <div className="max-w-4xl mx-auto px-4">
+          <button onClick={onBack} className="flex items-center gap-2 text-blue-200 hover:text-white mb-6 transition-colors">
+            <ArrowLeft size={18} /> {t.backToBlog}
+          </button>
+          <div className="flex items-center gap-3 text-blue-200 text-sm mb-4">
+            <span className="bg-blue-500/30 px-3 py-1 rounded-full">{article.category}</span>
+            <span className="flex items-center gap-1"><Calendar size={14} /> {article.date}</span>
+            <span className="flex items-center gap-1"><Clock size={14} /> {article.readTime}</span>
+          </div>
+          <h1 className="text-3xl md:text-4xl font-bold mb-4">{article.title}</h1>
+          <p className="text-blue-100 text-lg">{article.excerpt}</p>
+          <div className="flex items-center gap-3 mt-6">
+            <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+              <User size={20} />
+            </div>
+            <span>{article.author}</span>
+          </div>
+        </div>
+      </header>
+
+      {/* Article Content */}
+      <article className="max-w-4xl mx-auto px-4 py-12">
+        <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-600 prose-strong:text-gray-900 prose-ul:text-gray-600 prose-ol:text-gray-600">
+          {article.content.split('\n').map((paragraph, i) => {
+            if (paragraph.startsWith('## ')) {
+              return <h2 key={i} className="text-2xl font-bold mt-8 mb-4 text-gray-900">{paragraph.replace('## ', '')}</h2>;
+            } else if (paragraph.startsWith('### ')) {
+              return <h3 key={i} className="text-xl font-bold mt-6 mb-3 text-gray-800">{paragraph.replace('### ', '')}</h3>;
+            } else if (paragraph.startsWith('**') && paragraph.endsWith('**')) {
+              return <p key={i} className="font-bold text-gray-800 mt-4">{paragraph.replace(/\*\*/g, '')}</p>;
+            } else if (paragraph.startsWith('- ')) {
+              return <li key={i} className="ml-6 text-gray-600">{paragraph.replace('- ', '')}</li>;
+            } else if (paragraph.startsWith('|')) {
+              return null; // Skip table markdown for simplicity
+            } else if (paragraph.trim()) {
+              return <p key={i} className="mb-4 text-gray-600 leading-relaxed">{paragraph}</p>;
+            }
+            return null;
+          })}
+        </div>
+
+        {/* Share Section */}
+        <div className="border-t border-b py-6 my-8">
+          <div className="flex items-center justify-between">
+            <span className="font-medium text-gray-700">{t.shareArticle}</span>
+            <div className="flex gap-3">
+              <button className="w-10 h-10 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center hover:bg-blue-200 transition-colors">
+                <Share2 size={18} />
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Related Articles */}
+        {relatedArticles.length > 0 && (
+          <div className="mt-12">
+            <h3 className="text-xl font-bold mb-6">{t.relatedArticles}</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {relatedArticles.map(related => (
+                <div key={related.id} className="bg-gray-50 rounded-xl p-5 hover:bg-gray-100 transition-colors cursor-pointer">
+                  <span className="text-xs text-blue-600 font-medium">{related.category}</span>
+                  <h4 className="font-bold mt-1 mb-2">{related.title}</h4>
+                  <p className="text-sm text-gray-500">{related.excerpt}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+      </article>
+    </div>
+  );
+};
+
+// Blog List Page Component
+const BlogListPage = ({ articles, t, onSelectArticle, onBackToHome }) => {
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <header className="bg-white border-b">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <button onClick={onBackToHome} className="flex items-center gap-2 text-gray-500 hover:text-blue-600 mb-4 transition-colors">
+            <ArrowLeft size={18} /> {t.backToHome}
+          </button>
+          <h1 className="text-3xl font-bold text-gray-900">{t.blogTitle}</h1>
+          <p className="text-gray-500 mt-2">{t.blogSubtitle}</p>
+        </div>
+      </header>
+
+      <main className="max-w-6xl mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {articles.map(article => (
+            <article 
+              key={article.id} 
+              className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+              onClick={() => onSelectArticle(article)}
+            >
+              <div className="h-40 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                <FileText size={48} className="text-white/50" />
+              </div>
+              <div className="p-5">
+                <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
+                  <span className="bg-blue-50 text-blue-600 px-2 py-1 rounded">{article.category}</span>
+                  <span>{article.date}</span>
+                  <span>{article.readTime}</span>
+                </div>
+                <h2 className="font-bold text-gray-900 mb-2 line-clamp-2">{article.title}</h2>
+                <p className="text-gray-500 text-sm line-clamp-2">{article.excerpt}</p>
+                <button className="mt-4 text-blue-600 font-medium text-sm flex items-center gap-1 hover:gap-2 transition-all">
+                  {t.readArticle} <ArrowRight size={14} />
+                </button>
+              </div>
+            </article>
+          ))}
+        </div>
+      </main>
+    </div>
+  );
+};
+
+// Main App Component
 const ImageUpscaler = () => {
-  const [lang, setLang] = useState('zh-TW');
+  const [lang, setLang] = useState('en');
+  const [currentPage, setCurrentPage] = useState('home'); // 'home', 'blog', 'article'
+  const [selectedArticle, setSelectedArticle] = useState(null);
   const [image, setImage] = useState(null);
   const [processedImageUrl, setProcessedImageUrl] = useState(null);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -542,28 +1317,12 @@ const ImageUpscaler = () => {
   const [metadata, setMetadata] = useState({ width: 0, height: 0, name: '' });
   const [showCookie, setShowCookie] = useState(true);
   const [activeModal, setActiveModal] = useState(null);
-  const [activeDemoType, setActiveDemoType] = useState('landscape');
   
   const fileInputRef = useRef(null);
   const editorRef = useRef(null);
   
   const t = TRANSLATIONS[lang] || TRANSLATIONS['en'];
-  
-  // Generate demo images
-  const demoImages = useMemo(() => ({
-    landscape: {
-      before: generateRealisticDemo('landscape', 300, 300, true),
-      after: generateRealisticDemo('landscape', 300, 300, false)
-    },
-    portrait: {
-      before: generateRealisticDemo('portrait', 300, 300, true),
-      after: generateRealisticDemo('portrait', 300, 300, false)
-    },
-    anime: {
-      before: generateRealisticDemo('anime', 300, 300, true),
-      after: generateRealisticDemo('anime', 300, 300, false)
-    }
-  }), []);
+  const articles = BLOG_ARTICLES[lang] || BLOG_ARTICLES['en'];
   
   useEffect(() => {
     if (sessionStorage.getItem('cookie')) setShowCookie(false);
@@ -639,6 +1398,62 @@ const ImageUpscaler = () => {
     setSliderPos(Math.max(0, Math.min(100, (x / rect.width) * 100)));
   };
 
+  const navigateTo = (page, article = null) => {
+    setCurrentPage(page);
+    setSelectedArticle(article);
+    window.scrollTo(0, 0);
+  };
+
+  // Render Blog Article Page
+  if (currentPage === 'article' && selectedArticle) {
+    const relatedArticles = articles.filter(a => a.id !== selectedArticle.id).slice(0, 2);
+    return (
+      <div>
+        <BlogArticlePage 
+          article={selectedArticle} 
+          t={t} 
+          onBack={() => navigateTo('blog')}
+          relatedArticles={relatedArticles}
+        />
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-8">
+          <div className="max-w-6xl mx-auto px-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Maximize className="text-blue-400" size={24} />
+              <span className="font-bold text-xl">{t.companyName}</span>
+            </div>
+            <p className="text-gray-400 text-sm">{t.footer}</p>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // Render Blog List Page
+  if (currentPage === 'blog') {
+    return (
+      <div>
+        <BlogListPage 
+          articles={articles} 
+          t={t} 
+          onSelectArticle={(article) => navigateTo('article', article)}
+          onBackToHome={() => navigateTo('home')}
+        />
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-8">
+          <div className="max-w-6xl mx-auto px-4 text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <Maximize className="text-blue-400" size={24} />
+              <span className="font-bold text-xl">{t.companyName}</span>
+            </div>
+            <p className="text-gray-400 text-sm">{t.footer}</p>
+          </div>
+        </footer>
+      </div>
+    );
+  }
+
+  // Render Home Page
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
       <AnimatePresence>
@@ -663,7 +1478,7 @@ const ImageUpscaler = () => {
       </Modal>
       
       <div className="max-w-6xl mx-auto px-4 py-8">
-        {/* Header */}
+        {/* Header with Navigation */}
         <header className="flex flex-col md:flex-row items-center justify-between gap-4 mb-8">
           <div className="flex items-center gap-3">
             <div className="w-12 h-12 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center">
@@ -674,24 +1489,34 @@ const ImageUpscaler = () => {
               <p className="text-sm text-gray-500">{t.subtitle}</p>
             </div>
           </div>
-          <select 
-            value={lang} 
-            onChange={e => setLang(e.target.value)}
-            className="px-4 py-2 bg-white border rounded-lg text-sm"
-          >
-            <option value="zh-TW">繁體中文</option>
-            <option value="en">English</option>
-          </select>
+          <div className="flex items-center gap-4">
+            <nav className="flex items-center gap-4 text-sm">
+              <button onClick={() => navigateTo('home')} className="text-gray-600 hover:text-blue-600 font-medium flex items-center gap-1">
+                <Home size={16} /> {t.home}
+              </button>
+              <button onClick={() => navigateTo('blog')} className="text-gray-600 hover:text-blue-600 font-medium flex items-center gap-1">
+                <BookOpen size={16} /> {t.blog}
+              </button>
+            </nav>
+            <select 
+              value={lang} 
+              onChange={e => setLang(e.target.value)}
+              className="px-3 py-2 bg-white border rounded-lg text-sm"
+            >
+              <option value="en">English</option>
+              <option value="zh-TW">繁體中文</option>
+            </select>
+          </div>
         </header>
         
         {/* Hero Stats */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           <div className="bg-white rounded-xl p-4 text-center shadow-sm border">
-            <div className="text-2xl font-black text-blue-600"><AnimatedCounter end={1847293} /></div>
+            <div className="text-2xl font-black text-blue-600"><AnimatedCounter end={2847293} /></div>
             <div className="text-xs text-gray-500">{t.statsProcessed}</div>
           </div>
           <div className="bg-white rounded-xl p-4 text-center shadow-sm border">
-            <div className="text-2xl font-black text-green-600"><AnimatedCounter end={89432} /></div>
+            <div className="text-2xl font-black text-green-600"><AnimatedCounter end={189432} /></div>
             <div className="text-xs text-gray-500">{t.statsUsers}</div>
           </div>
           <div className="bg-white rounded-xl p-4 text-center shadow-sm border">
@@ -713,61 +1538,13 @@ const ImageUpscaler = () => {
               <p className="text-lg text-gray-600 max-w-2xl mx-auto">{t.heroSubtitle}</p>
             </section>
             
-            {/* Interactive Demo Section */}
-            <section className="mb-16">
-              <div className="text-center mb-8">
-                <div className="inline-flex items-center gap-2 bg-green-100 text-green-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
-                  <Play size={16} /> {t.liveDemo}
-                </div>
-                <h3 className="text-2xl font-bold text-gray-800 mb-2">{t.interactiveDemo}</h3>
-                <p className="text-gray-500">{t.interactiveDemoDesc}</p>
-              </div>
-              
-              {/* Demo Type Selector */}
-              <div className="flex justify-center gap-2 mb-6">
-                {['landscape', 'portrait', 'anime'].map(type => (
-                  <button
-                    key={type}
-                    onClick={() => setActiveDemoType(type)}
-                    className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${
-                      activeDemoType === type 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                    }`}
-                  >
-                    {type === 'landscape' ? t.landscapePhoto : type === 'portrait' ? t.portraitPhoto : t.animeArt}
-                  </button>
-                ))}
-              </div>
-              
-              {/* Interactive Demo */}
-              <div className="max-w-md mx-auto">
-                <InteractiveDemo 
-                  t={t}
-                  beforeImage={demoImages[activeDemoType].before}
-                  afterImage={demoImages[activeDemoType].after}
-                />
-              </div>
-              
-              {/* CTA Button */}
-              <div className="text-center mt-8">
-                <button 
-                  onClick={() => fileInputRef.current?.click()}
-                  className="inline-flex items-center gap-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-8 py-4 rounded-xl font-bold text-lg shadow-lg hover:shadow-xl transition-all"
-                >
-                  <Upload size={20} />
-                  {t.tryYourOwn}
-                </button>
-                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleUpload} />
-              </div>
-            </section>
-            
             {/* Upload Area */}
             <section className="mb-16">
               <div 
                 onClick={() => fileInputRef.current?.click()}
                 className="bg-white border-2 border-dashed border-blue-200 rounded-2xl p-12 text-center cursor-pointer hover:border-blue-400 hover:bg-blue-50/30 transition-all"
               >
+                <input type="file" ref={fileInputRef} className="hidden" accept="image/*" onChange={handleUpload} />
                 <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Upload className="text-blue-600" size={28} />
                 </div>
@@ -950,19 +1727,53 @@ const ImageUpscaler = () => {
             ))}
           </div>
         </section>
+
+        {/* Blog Preview */}
+        <section className="mb-16">
+          <div className="flex items-center justify-between mb-8">
+            <h3 className="text-2xl font-bold">{t.blogTitle}</h3>
+            <button 
+              onClick={() => navigateTo('blog')}
+              className="text-blue-600 font-medium flex items-center gap-1 hover:gap-2 transition-all"
+            >
+              View All <ArrowRight size={16} />
+            </button>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {articles.slice(0, 3).map(article => (
+              <article 
+                key={article.id} 
+                className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer border"
+                onClick={() => navigateTo('article', article)}
+              >
+                <div className="h-32 bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                  <FileText size={36} className="text-white/50" />
+                </div>
+                <div className="p-4">
+                  <div className="flex items-center gap-2 text-xs text-gray-400 mb-2">
+                    <span className="bg-blue-50 text-blue-600 px-2 py-0.5 rounded">{article.category}</span>
+                    <span>{article.readTime}</span>
+                  </div>
+                  <h4 className="font-bold text-sm mb-2 line-clamp-2">{article.title}</h4>
+                  <p className="text-gray-500 text-xs line-clamp-2">{article.excerpt}</p>
+                </div>
+              </article>
+            ))}
+          </div>
+        </section>
         
-        {/* Testimonials */}
+        {/* Testimonials - Multi-national */}
         <section className="mb-16">
           <h3 className="text-2xl font-bold text-center mb-8">{t.testimonialsTitle}</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {t.testimonials?.slice(0, 3).map((review, i) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {t.testimonials?.map((review, i) => (
               <div key={i} className="bg-white rounded-xl p-5 border">
                 <div className="flex gap-1 mb-3">
                   {[1,2,3,4,5].map(s => <Star key={s} size={14} className="text-yellow-400 fill-yellow-400" />)}
                 </div>
-                <p className="text-gray-600 text-sm mb-4">"{review.text}"</p>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold text-sm">{review.avatar}</div>
+                <p className="text-gray-600 text-sm mb-4 italic">"{review.text}"</p>
+                <div className="flex items-center gap-3 border-t pt-4">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold">{review.avatar}</div>
                   <div>
                     <p className="font-medium text-sm">{review.name}</p>
                     <p className="text-gray-400 text-xs">{review.role}</p>
@@ -977,7 +1788,7 @@ const ImageUpscaler = () => {
         <section className="mb-16">
           <h3 className="text-2xl font-bold text-center mb-8">{t.faqTitle}</h3>
           <div className="max-w-2xl mx-auto bg-white rounded-xl border p-6">
-            {t.faqItems?.slice(0, 5).map((item, i) => (
+            {t.faqItems?.map((item, i) => (
               <FAQItem key={i} question={item.q} answer={item.a} />
             ))}
           </div>
@@ -999,13 +1810,20 @@ const ImageUpscaler = () => {
         
         {/* Footer */}
         <footer className="border-t pt-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <Maximize className="text-blue-600" size={20} />
                 <span className="font-bold">{t.companyName}</span>
               </div>
               <p className="text-sm text-gray-500">{t.companyEmail}</p>
+            </div>
+            <div>
+              <h4 className="font-bold mb-3">Navigation</h4>
+              <div className="space-y-2">
+                <button onClick={() => navigateTo('home')} className="block text-sm text-gray-500 hover:text-blue-600">{t.home}</button>
+                <button onClick={() => navigateTo('blog')} className="block text-sm text-gray-500 hover:text-blue-600">{t.blog}</button>
+              </div>
             </div>
             <div>
               <h4 className="font-bold mb-3">Legal</h4>
