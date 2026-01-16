@@ -9,7 +9,7 @@ const BLOG_ARTICLES = {
       id: 'understanding-image-interpolation',
       title: 'Understanding Image Interpolation: A Complete Guide',
       excerpt: 'Learn how different interpolation algorithms affect image quality when upscaling photos.',
-      date: '2024-12-14',
+      date: '2020-12-14',
       readTime: '8 min read',
       category: 'Technology',
       author: 'Scale X Team',
@@ -1512,15 +1512,15 @@ const ImageUpscaler = () => {
         {/* Hero Stats */}
         <section className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
           <div className="bg-white rounded-xl p-4 text-center shadow-sm border">
-            <div className="text-2xl font-black text-blue-600"><AnimatedCounter end={2847293} /></div>
+            <div className="text-2xl font-black text-blue-600"><AnimatedCounter end={28472} /></div>
             <div className="text-xs text-gray-500">{t.statsProcessed}</div>
           </div>
           <div className="bg-white rounded-xl p-4 text-center shadow-sm border">
-            <div className="text-2xl font-black text-green-600"><AnimatedCounter end={189432} /></div>
+            <div className="text-2xl font-black text-green-600"><AnimatedCounter end={1894} /></div>
             <div className="text-xs text-gray-500">{t.statsUsers}</div>
           </div>
           <div className="bg-white rounded-xl p-4 text-center shadow-sm border">
-            <div className="text-2xl font-black text-purple-600"><AnimatedCounter end={156} /></div>
+            <div className="text-2xl font-black text-purple-600"><AnimatedCounter end={15} /></div>
             <div className="text-xs text-gray-500">{t.statsCountries}</div>
           </div>
           <div className="bg-white rounded-xl p-4 text-center shadow-sm border">
